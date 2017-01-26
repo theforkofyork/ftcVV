@@ -229,8 +229,10 @@ public class LBHW implements PID_Constants
             double dervitive = (currentError - prevError) / tChange;
             double dervitivekd = dervitive * KD_TURN;
             newPower = (errorkp + integralki + dervitivekd);
-            rightDrive(-newPower);
-            leftDrive(newPower);
+            mr1.setPower(-newPower);
+            mr2.setPower(-newPower);
+            ml1.setPower(newPower);
+            ml2.setPower(newPower);
             prevError = currentError;
             LBHW.getTelemetry().addTelemetry("TargetAngle", targetAngle);
            LBHW.getTelemetry().addTelemetry("Heading", imuVAL);

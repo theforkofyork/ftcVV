@@ -89,7 +89,6 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     /* Declare OpMode members. */
     LBHW robot = new LBHW ();
     AdafruitIMU imu = new AdafruitIMU("IMU");
-
     private ElapsedTime runtime = new ElapsedTime();
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: TETRIX Motor Encoder
@@ -149,9 +148,10 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
         robot.mr1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-
+      //  DashBoard dash = new DashBoard(telemetry);
         while (!isStarted()) {
-            DashBoard dash = new DashBoard(telemetry);
+
+          // dash.create("Status", "Initialized");
             imu.telemetryRun();
             telemetry.update();
             idle();
@@ -171,9 +171,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             odsReadingLinear = Math.pow(odsReadngRaw, -0.5);
             odsReadngRaw2 = robot.ODS2.getRawLightDetected();
             odsReadingLinear2 = Math.pow(odsReadngRaw2, -0.5);
-            double POWER = 0.20;
 
-            double disruption = imu.getHeading();
 
             switch (state) {
                 case Drive_Forward: {  //Drive forward for 0.7 seconds then stop and switch states to the turning coder
@@ -266,6 +264,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                         state = State.Turn_To_Beacon;
                     }
                     telemetry.addData("cm", "%.2f cm", robot.rangeSensor.getDistance(DistanceUnit.CM));
+
                     telemetry.update();
                 }
                 break;
@@ -364,6 +363,9 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             }
 
            // telemetry.addData(imu.getName(), imu.telemetrize());
+            telemetry.addData("Roll",imu.getRoll());
+            telemetry.addData("Pitch",imu.getPitch());
+            telemetry.addData("TargetAngle", imu.getHeading());
             telemetry.update();
 
 
