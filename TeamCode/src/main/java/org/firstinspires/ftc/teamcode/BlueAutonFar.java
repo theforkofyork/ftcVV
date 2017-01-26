@@ -48,6 +48,7 @@ import org.firstinspires.ftc.teamcode.Direction;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Clock;
+import org.firstinspires.ftc.teamcode.DashBoard;
 
 /**
  Works for both red and blue sides
@@ -86,8 +87,8 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     State state;
 
     /* Declare OpMode members. */
-    LBHW robot = new LBHW();
-
+    LBHW robot = new LBHW ();
+    AdafruitIMU imu = new AdafruitIMU("IMU");
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -127,7 +128,6 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     @Override
     public void runOpMode() throws InterruptedException {
         //MasqAdafruitIMU imu = new MasqAdafruitIMU("IMU", hardwareMap);
-        AdafruitIMU imu = new AdafruitIMU("IMU", hardwareMap);
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
@@ -148,13 +148,14 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
         robot.mr2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.mr1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
+
         while (!isStarted()) {
+            DashBoard dash = new DashBoard(telemetry);
             imu.telemetryRun();
             telemetry.update();
+            idle();
         }
-
-
-
 
         // make sure the gyro is calibrated.
 
@@ -191,7 +192,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 break;
 
                 case Turn_To_Line: {
-                   turnPID(0.1,5,Direction.RIGHT,0);
+                   robot.turnPID(0.25,10,Direction.RIGHT);
                     state = State.Drive_To_Line;
                 }
                 break;
@@ -214,7 +215,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 break;
 
                 case Align: { //Align to the beacon by turning -85 degrees
-                    imuRight(67,0.06);;
+                  //  imuRight(67,0.06);;
                     state = State.WallALign;
 
                 }
@@ -293,7 +294,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Turn_To_Beacon: { //Align to the beacon by turning -85 degrees
-                    imuRight(82,0.1);
+                //    imuRight(82,0.1);
                     state = State.Reverse2;
 
                 }
@@ -315,7 +316,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Align2: {
-                    imuLeft(67,0.045);
+                  //  imuLeft(67,0.045);
                     state = State.WallAlign2;
 
                 }
@@ -379,7 +380,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
      *  3) Driver stops the opmode running.
      */
 
-    public void imuRight(int degs, double speed){
+    /*  public void imuRight(int degs, double speed){
         double[] angles = robot.imu.getAngles();
         double yaw = angles[0];
         double yawStart = yaw;
@@ -396,7 +397,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             robot.mr2.setPower(speed);
         }
     }
-    public void imuLeft(int degs, double speed){
+  public void imuLeft(int degs, double speed){
         double[] angles = robot.imu.getAngles();
         double yaw = angles[0];
         double yawStart = yaw;
@@ -413,7 +414,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             robot.mr2.setPower(-speed);
         }
     }
-
+*/
     public void turnAbsolute(int target) throws InterruptedException {
         MasqAdafruitIMU imu = new MasqAdafruitIMU("IMU", hardwareMap);
         double[] angles = imu.getAngles();
@@ -594,65 +595,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
         setMotorPower(robot.fly, motorOut);
 
     }
-    public BlueAutonFar(Telemetry telemetry){
-        this.telemetry  = telemetry;
-        instance = this;
-    }
-    public static BlueAutonFar getTelemetry(){
-        return instance;
-    }
-    private static BlueAutonFar instance;
-    private Telemetry telemetry;
-    public void addTelemetry(String string) {
-        telemetry.addLine(string);
-    }
-    public void addTelemetry(String string, Object data) {
-        telemetry.addData(string, data);
-    }
-    public void turnPID(double power, int angle, Direction DIRECTION, double timeOut,  int sleepTime) {
-        AdafruitIMU imu = new AdafruitIMU("IMU", hardwareMap);
-        double targetAngle = imu.adjustAngle(imu.getHeading() + (DIRECTION.value * angle));
-        double acceptableError = 0.5;
-        double currentError = 1;
-        double prevError = 0;
-        double integral = 0;
-        double newPower = power;
-        double previousTime = 0;
-        Clock clock = new Clock("clock");
-        while (opModeIsActive() && (imu.adjustAngle(Math.abs(currentError)) > acceptableError) && !clock.elapsedTime(timeOut, Clock.Resolution.SECONDS)) {
-            double tChange = System.nanoTime() - previousTime;
-            previousTime = System.nanoTime();
-            tChange = tChange / 1e9;
-            double imuVAL = imu.getHeading();
-            currentError = imu.adjustAngle(targetAngle - imuVAL);
-            integral += currentError  * ID;
-            double errorkp = currentError * KP_TURN;
-            double integralki = currentError * KI_TURN * tChange;
-            double dervitive = (currentError - prevError) / tChange;
-            double dervitivekd = dervitive * KD_TURN;
-            newPower = (errorkp + integralki + dervitivekd);
-           robot.mr1.setPower(-newPower);
-            robot.mr2.setPower(-newPower);
-            robot.ml1.setPower(newPower);
-            robot.ml2.setPower(newPower);
-            prevError = currentError;
-           BlueAutonFar.getTelemetry().addTelemetry("TargetAngle", targetAngle);
-            BlueAutonFar.getTelemetry().addTelemetry("Heading", imuVAL);
-            BlueAutonFar.getTelemetry().addTelemetry("AngleLeftToCover", currentError);
-            telemetry.update();
-        }
-        robot.mr1.setPower(0);
-        robot.mr2.setPower(0);
-        robot.ml1.setPower(0);
-        robot.ml2.setPower(0);
-        sleep(sleepTime);
-    }
-    public void turnPID(double power, int angle, Direction DIRECTION, double timeout)  {
-        turnPID(power, angle, DIRECTION, timeout, DEFAULT_SLEEP_TIME);
-    }
-    public void turnPID(double power, int angle, Direction DIRECTION)  {
-        turnPID(power, angle, DIRECTION, DEFAULT_TIMEOUT);
-    }
+
 }
 
 

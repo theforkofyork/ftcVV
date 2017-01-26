@@ -33,6 +33,7 @@ package org.firstinspires.ftc.robotcontroller.internal;
 
 import com.google.blocks.ftcrobotcontroller.runtime.BlocksOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerImpl;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
@@ -42,6 +43,9 @@ import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
  * @see #register(OpModeManager)
  */
 public class FtcOpModeRegister implements OpModeRegister {
+
+    // Modified by Varun Singh to allow public access to current OpMode and HardwareMap
+    public static OpModeManagerImpl opModeManager;
 
     /**
      * {@link #register(OpModeManager)} is called by the SDK game in order to register
@@ -63,6 +67,9 @@ public class FtcOpModeRegister implements OpModeRegister {
      * @see com.qualcomm.robotcore.eventloop.opmode.Autonomous
      */
     public void register(OpModeManager manager) {
+
+        // Modified by Varun Singh to allow public access to current OpMode and HardwareMap
+        opModeManager = (OpModeManagerImpl) manager;
 
         /**
          * Register OpModes implemented in the Blocks visual programming language.

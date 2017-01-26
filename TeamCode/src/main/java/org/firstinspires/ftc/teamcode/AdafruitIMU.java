@@ -1,29 +1,28 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import java.util.Locale;
 
 import org.firstinspires.ftc.teamcode.LBHW;
+
 
 /**
  * Created by Archish on 10/28/16.
  */
 
 public class AdafruitIMU {
-    private Telemetry telemetry;
     private final BNO055IMU imu;
     private final String name;
 
-
-
     public AdafruitIMU(String name) {
         this.name = name;
-        imu = FtcOpModeRegister.getHardwareMap().get(BNO055IMU.class, name);
+        imu = FtcOpModeRegister.opModeManager.getHardwareMap().get(BNO055IMU.class, name);
         setParameters();
     }
 
@@ -39,7 +38,6 @@ public class AdafruitIMU {
     }
 
 
-    // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_from_Quaternion
     public double[] getAngles() {
         Quaternion quatAngles = imu.getQuaternionOrientation();
 
@@ -48,7 +46,6 @@ public class AdafruitIMU {
         double y = quatAngles.y;
         double z = quatAngles.z;
 
-        // for the Adafruit IMU, yaw and roll are switched
         double roll = Math.atan2( 2*(w*x + y*z) , 1 - 2*(x*x + y*y) ) * 180.0 / Math.PI;
         double pitch = Math.asin( 2*(w*y - x*z) ) * 180.0 / Math.PI;
         double yaw = Math.atan2( 2*(w*z + x*y), 1 - 2*(y*y + z*z) ) * 180.0 / Math.PI;
@@ -71,7 +68,6 @@ public class AdafruitIMU {
     }
 
     public void telemetryRun() {
-
     }
 
 }

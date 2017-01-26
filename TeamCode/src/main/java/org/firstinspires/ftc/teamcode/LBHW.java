@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
@@ -63,7 +65,8 @@ public class LBHW implements PID_Constants
     private long fLastVelocityTime = 0;
 
     private double tolerance = 0.5e-7;
-    MasqAdafruitIMU imu;
+    private static final int DEFAULT_SLEEP_TIME = 1000;
+    private static final double DEFAULT_TIMEOUT = 3;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -79,7 +82,7 @@ public class LBHW implements PID_Constants
 
         // Save reference to Hardware map
         hwMap = ahwMap;
-        AdafruitIMU imu = new AdafruitIMU("IMU", hwMap);
+        AdafruitIMU imu = new AdafruitIMU("IMU");
       //  imu = new MasqAdafruitIMU("IMU", hwMap);
         // Define and Initialize Motors
         mr1 = hwMap.dcMotor.get("mr1");
@@ -111,12 +114,14 @@ public class LBHW implements PID_Constants
         bleft.setPosition(0.5);
         bright.setPosition(0.5);
 
+
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         ml1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ml2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mr2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mr1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         // Define and initialize ALL installed servos.
@@ -191,8 +196,19 @@ public class LBHW implements PID_Constants
     public void addTelemetry(String string, Object data) {
         telemetry.addData(string, data);
     }
+    public void addSticky(String string){
+        telemetry.log().add(string);
+        telemetry.update();
+    }
+    public void addSticky(String string, Object data){
+        telemetry.log().add(string, data);
+        telemetry.update();
+    }
+    private boolean opModeIsActive() {
+        return ((LinearOpMode) (FtcOpModeRegister.opModeManager.getActiveOpMode())).opModeIsActive();
+    }
     public void turnPID(double power, int angle, Direction DIRECTION, double timeOut,  int sleepTime) {
-        AdafruitIMU imu = new AdafruitIMU("IMU", hwMap);
+        AdafruitIMU imu = new AdafruitIMU("IMU");
         double targetAngle = imu.adjustAngle(imu.getHeading() + (DIRECTION.value * angle));
         double acceptableError = 0.5;
         double currentError = 1;
@@ -216,14 +232,25 @@ public class LBHW implements PID_Constants
             rightDrive(-newPower);
             leftDrive(newPower);
             prevError = currentError;
-            BlueAutonFar.getTelemetry().addTelemetry("TargetAngle", targetAngle);
-            BlueAutonFar.getTelemetry().addTelemetry("Heading", imuVAL);
-            BlueAutonFar.getTelemetry().addTelemetry("AngleLeftToCover", currentError);
+            LBHW.getTelemetry().addTelemetry("TargetAngle", targetAngle);
+           LBHW.getTelemetry().addTelemetry("Heading", imuVAL);
+            LBHW.getTelemetry().addTelemetry("AngleLeftToCover", currentError);
             telemetry.update();
         }
-        leftDrive(0);
         rightDrive(0);
+        leftDrive(0);
         sleep(sleepTime);
+    }
+    public void sleep() {
+        sleep(1000);
+    }
+
+    public void sleep(int time) {
+        try {
+            Thread.sleep((long) time);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
     }
     public void turnPID(double power, int angle, Direction DIRECTION, double timeout)  {
         turnPID(power, angle, DIRECTION, timeout, DEFAULT_SLEEP_TIME);
@@ -231,7 +258,6 @@ public class LBHW implements PID_Constants
     public void turnPID(double power, int angle, Direction DIRECTION)  {
         turnPID(power, angle, DIRECTION, DEFAULT_TIMEOUT);
     }
-
 }
 
 
