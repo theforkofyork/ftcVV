@@ -104,7 +104,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     static double odsReadngRaw2;
     static double odsReadingLinear2;
 
-    double TARGET_VOLTAGE = 13.2;
+    double TARGET_VOLTAGE = 12.5;
     double voltage = 0;
     double kP = 0.18;
 
@@ -150,11 +150,8 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
 
       //  DashBoard dash = new DashBoard(telemetry);
         while (!isStarted()) {
-
-          // dash.create("Status", "Initialized");
-            imu.telemetryRun();
+            telemetry.addData("Status", "Initialization Complete");
             telemetry.update();
-            idle();
         }
 
         // make sure the gyro is calibrated.
@@ -190,7 +187,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 break;
 
                 case Turn_To_Line: {
-                   robot.turnPID(0.25,10,Direction.RIGHT);
+                   imuRight(3,0.06);
                     state = State.Drive_To_Line;
                 }
                 break;
@@ -200,7 +197,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     state = State.Drive_To_Line;
                 } break;
                 case Drive_To_Line:
-                    if (odsReadingLinear <= 2) {
+                    if (odsReadingLinear <= 1.5) {
                        // encoderDrive(SLOW_SPEED,0.15,0.15,3);
                        powerDrive(0.1);
                         sleep(200);
@@ -213,7 +210,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 break;
 
                 case Align: { //Align to the beacon by turning -85 degrees
-                  //  imuRight(67,0.06);;
+                   imuRight(63,0.05);;
                     state = State.WallALign;
 
                 }
@@ -293,7 +290,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Turn_To_Beacon: { //Align to the beacon by turning -85 degrees
-                //    imuRight(82,0.1);
+                      imuRight(84,0.06);
                     state = State.Reverse2;
 
                 }
@@ -304,7 +301,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     state = State.Drive_To_Line2;
                 } break;
                 case Drive_To_Line2: // Drive to the white line
-                    if (odsReadingLinear <= 2 || odsReadingLinear2 <= 2) { // Once the line is detected, stop the roobot and switch states
+                    if (odsReadingLinear <= 1.5 || odsReadingLinear2 <= 1.5) { // Once the line is detected, stop the roobot and switch states
                         powerDrive(0.1);
                         sleep(400);
                         powerDrive(0);
@@ -315,7 +312,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Align2: {
-                  //  imuLeft(67,0.045);
+                   imuLeft(150,0.06);
                     state = State.WallAlign2;
 
                 }
@@ -382,8 +379,8 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
      *  3) Driver stops the opmode running.
      */
 
-    /*  public void imuRight(int degs, double speed){
-        double[] angles = robot.imu.getAngles();
+      public void imuRight(int degs, double speed){
+        double[] angles = imu.getAngles();
         double yaw = angles[0];
         double yawStart = yaw;
         // this adds telemetry data using the telemetrize() method in the MasqAdafruitIMU class
@@ -391,7 +388,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             telemetry.addData("Target",((yawStart - degs) % 360));
             telemetry.addData("Progress",Math.abs(yaw - ((yawStart - degs) % 360)));
             telemetry.update();
-            angles = robot.imu.getAngles();
+            angles = imu.getAngles();
             yaw = angles[0];
             robot.ml1.setPower(-speed);
             robot.mr1.setPower(speed);
@@ -400,15 +397,15 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
         }
     }
   public void imuLeft(int degs, double speed){
-        double[] angles = robot.imu.getAngles();
+        double[] angles = imu.getAngles();
         double yaw = angles[0];
         double yawStart = yaw;
         // this adds telemetry data using the telemetrize() method in the MasqAdafruitIMU class
-        while(Math.abs(yaw - ((yawStart + degs*.8) % 360)) > 2  && opModeIsActive()) {
+        while(Math.abs(yaw - ((yawStart + degs*.8) % 360)) > 3  && opModeIsActive()) {
             telemetry.addData("Target",((yawStart - degs) % 360));
             telemetry.addData("Progress",Math.abs(yaw - ((yawStart - degs) % 360)));
             telemetry.update();
-            angles = robot.imu.getAngles();
+            angles = imu.getAngles();
             yaw = angles[0];
             robot.ml1.setPower(speed);
             robot.mr1.setPower(-speed);
@@ -416,7 +413,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             robot.mr2.setPower(-speed);
         }
     }
-*/
+
     public void turnAbsolute(int target) throws InterruptedException {
         MasqAdafruitIMU imu = new MasqAdafruitIMU("IMU", hardwareMap);
         double[] angles = imu.getAngles();

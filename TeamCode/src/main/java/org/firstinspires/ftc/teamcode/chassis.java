@@ -29,7 +29,7 @@ public class chassis extends OpMode {
     public chassis() {
 
     }
-    double TARGET_VOLTAGE = 13.2;
+    double TARGET_VOLTAGE = 12.5;
     double voltage = 0;
     double kP = 0.18;
     boolean IS_GATE_OPEN = false;
@@ -222,7 +222,7 @@ public class chassis extends OpMode {
     public void voltageshoot() {
         voltage = batteryVoltage();
         double error = TARGET_VOLTAGE - voltage;
-        double motorOut = (error * kP) + .9;
+        double motorOut = (error * kP) + .85;
         motorOut = Range.clip(motorOut, 0, 1);
         setMotorPower(fly, motorOut);
     }
