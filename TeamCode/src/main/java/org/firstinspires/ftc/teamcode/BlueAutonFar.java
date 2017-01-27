@@ -169,13 +169,12 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
             odsReadngRaw2 = robot.ODS2.getRawLightDetected();
             odsReadingLinear2 = Math.pow(odsReadngRaw2, -0.5);
 
-
             switch (state) {
                 case Drive_Forward: {  //Drive forward for 0.7 seconds then stop and switch states to the turning coder
                     robot.fly.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     voltageshoot();
                     robot.gate.setPosition(1);
-                    encoderDrive(SLOW_SPEED, 7.7, 7.7, 3);
+                    encoderDrive(SLOW_SPEED, 7.2, 7.2, 3);
                     state = State.Shoot;
                 }
                 break;
@@ -197,7 +196,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     state = State.Drive_To_Line;
                 } break;
                 case Drive_To_Line:
-                    if (odsReadingLinear <= 1.5) {
+                    if (robot.ODS.getLightDetected() <= 1.5) {
                        // encoderDrive(SLOW_SPEED,0.15,0.15,3);
                        powerDrive(0.1);
                         sleep(200);
@@ -219,7 +218,6 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 case WallALign: {
                     if (robot.rangeSensor.getDistance(DistanceUnit.CM) <= 12) {
                         encoderDrive(STOP,0,0,0);
-                        sleep(200);
                         state = State.Detect_Color;
                     }
                     else if (robot.rangeSensor.getDistance(DistanceUnit.CM) > 12) {
@@ -227,13 +225,13 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     }
                 } break;
                 case WallAlign2: {
-                    if (robot.rangeSensor.getDistance(DistanceUnit.CM) <= 12) {
+                    if (robot.rangeSensor.getDistance(DistanceUnit.CM) <= 13) {
                         encoderDrive(STOP,0,0,0);
-                        sleep(200);
                         state = State.Detect_Color2;
                     }
-                    else if (robot.rangeSensor.getDistance(DistanceUnit.CM) > 12) {
-                        powerDrive(0.1);
+                    else if (robot.rangeSensor.getDistance(DistanceUnit.CM) > 13) {
+                        robot.leftDrive(0.03);
+                        robot.rightDrive(0.1);
                     }
                 } break;
                 case Detect_Color: {
@@ -244,43 +242,35 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     } else {
                         encoderDrive(STOP,0,0,0);//if nothing is detected then stop the motors
                     }
-
                 }
                 break;
-
                 case Red_Beacon: {
                     {
                         robot.bright.setPosition(1);
-                        sleep(600);
+                        sleep(1000);
                         robot.bright.setPosition(0);
-                        sleep(600);
+                        sleep(700);
                         robot.bright.setPosition(0.5);
                         powerDrive(-0.2);
                         sleep(900);
                         powerDrive(0);
                         state = State.Turn_To_Beacon;
                     }
-                    telemetry.addData("cm", "%.2f cm", robot.rangeSensor.getDistance(DistanceUnit.CM));
-
-                    telemetry.update();
                 }
                 break;
 
                 case Blue_Beacon: {
                     {
                         robot.bleft.setPosition(0);
-                        sleep(600);
+                        sleep(1000);
                         robot.bleft.setPosition(1);
-                        sleep(600);
+                        sleep(700);
                         robot.bleft.setPosition(0.5);
                         powerDrive(-0.2);
                         sleep(900);
                         powerDrive(0);
                         state = State.Turn_To_Beacon;
                     }
-
-                    telemetry.addData("cm", "%.2f cm", robot.rangeSensor.getDistance(DistanceUnit.CM));
-                    telemetry.update();
                 }
                 break;
 
@@ -303,7 +293,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 case Drive_To_Line2: // Drive to the white line
                     if (odsReadingLinear <= 1.5 || odsReadingLinear2 <= 1.5) { // Once the line is detected, stop the roobot and switch states
                         powerDrive(0.1);
-                        sleep(400);
+                        sleep(800);
                         powerDrive(0);
                         state = State.Align2;
                     }
@@ -312,7 +302,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Align2: {
-                   imuLeft(150,0.06);
+                   imuLeft(113,0.06);
                     state = State.WallAlign2;
 
                 }
@@ -329,21 +319,27 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Red_Beacon2: {
-
-                    sleep(300);//Set the servo position to align with the red button
-                    //powerDrive();
+                    robot.bright.setPosition(1);
+                    sleep(1000);
+                    robot.bright.setPosition(0);
                     sleep(700);
-                    encoderDrive(DRIVE_SPEED, 0, 0, 0);
+                    robot.bright.setPosition(0.5);
+                    powerDrive(-0.2);
+                    sleep(900);
+                    powerDrive(0);
                     state = State.Park;
                 }
                 break;
 
                 case Blue_Beacon2: {
-
-                    sleep(300); //Set the servo position to align with the red button
-                    //powerDrive();
+                    robot.bleft.setPosition(0);
+                    sleep(1000);
+                    robot.bleft.setPosition(1);
                     sleep(700);
-                    encoderDrive(DRIVE_SPEED, 0, 0, 0);
+                    robot.bleft.setPosition(0.5);
+                    powerDrive(-0.2);
+                    sleep(900);
+                    powerDrive(0);
                     state = State.Park;
                 }
                 break;
@@ -556,14 +552,14 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     {
         fVelocityTime = System.nanoTime();
         fEncoder = robot.fly.getCurrentPosition();
-        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime); //Use the encoder on the motor to force the flywheel to run at a constant speed
 
-        if(fVelocity >= (fTarget + tolerance))
+        if(fVelocity >= (fTarget + tolerance)) //if the motor is equal to or greater than the target speed then keep it at .95
         {
-            setFPower(1);
+            setFPower(.95);
         }
 
-        else if(fVelocity < (fTarget - tolerance))
+        else if(fVelocity < (fTarget - tolerance)) //if the motor goes below the target speed, force it to run at full power
         {
             setFPower(1);
         }
@@ -588,10 +584,10 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     }
     public void voltageshoot() {
         voltage = batteryVoltage();
-        double error = TARGET_VOLTAGE - voltage;
-        double motorOut = (error * kP) + .85;
-        motorOut = Range.clip(motorOut, 0, 1);
-        setMotorPower(robot.fly, motorOut);
+        double error = TARGET_VOLTAGE - voltage; //error will be target voltage subtracted by current voltage
+        double motorOut = (error * kP) + .8; //motor out is the error multiplied by our KP constant which is .18 and then it adds what ever error * kP to the target speed
+        motorOut = Range.clip(motorOut, 0, 1); //make sure the motor doesn't go at a speed above 1
+        setMotorPower(robot.fly, motorOut); // set the adjusted power to the motor
 
     }
 

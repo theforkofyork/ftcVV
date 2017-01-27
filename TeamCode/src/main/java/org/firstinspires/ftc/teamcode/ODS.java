@@ -65,7 +65,7 @@ public class ODS extends LinearOpMode {
 
 
             telemetry.addData("ODS linear", odsReadingLinear);
-
+            telemetry.addData("ODS detected", ODS.getLightDetected());
             telemetry.update();
         }
     }

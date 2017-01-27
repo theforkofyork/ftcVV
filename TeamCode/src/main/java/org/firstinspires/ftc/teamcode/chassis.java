@@ -107,18 +107,17 @@ public class chassis extends OpMode {
            setFPower(0);
 
         if (gamepad1.a || gamepad2.a) {
-            IS_GATE_OPEN = false;
-            gate.setPosition(1);
+            IS_GATE_OPEN = false; //set is gate open to false
+            gate.setPosition(1); //keep gate closed
         } else if (gamepad1.b || gamepad2.b) {
-            IS_GATE_OPEN = true;
-            gate.setPosition(0.375);
+            IS_GATE_OPEN = true; //set is gate open to true
+            gate.setPosition(0.375); //open the gate
         }
-
         if (gamepad1.left_bumper || gamepad2.left_bumper)
             sweep.setPower(-1);
         else if (gamepad1.left_trigger > 0.25 || gamepad2.left_trigger > 0.25)
             sweep.setPower(1);
-        else if (IS_GATE_OPEN) {
+        else if (IS_GATE_OPEN) { //if IS_GATE_OPEN is set to true then run the sweeper at 0.35
             sweep.setPower(0.35);
         } else
             sweep.setPower(0);
@@ -222,7 +221,7 @@ public class chassis extends OpMode {
     public void voltageshoot() {
         voltage = batteryVoltage();
         double error = TARGET_VOLTAGE - voltage;
-        double motorOut = (error * kP) + .85;
+        double motorOut = (error * kP) + .82;
         motorOut = Range.clip(motorOut, 0, 1);
         setMotorPower(fly, motorOut);
     }
