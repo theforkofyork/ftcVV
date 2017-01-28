@@ -68,7 +68,9 @@ public class chassis extends OpMode {
         ml1.setDirection(DcMotor.Direction.REVERSE);
         mr1.setDirection(DcMotor.Direction.REVERSE);
         sweep.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        bright.setPosition(1);
+        bleft.setPosition(1);
+        gate.setPosition(1);
 
     }
 
@@ -109,8 +111,12 @@ public class chassis extends OpMode {
         if (gamepad1.a || gamepad2.a) {
             IS_GATE_OPEN = false; //set is gate open to false
             gate.setPosition(1); //keep gate closed
+            bright.setPosition(1);
+            bleft.setPosition(1);
         } else if (gamepad1.b || gamepad2.b) {
             IS_GATE_OPEN = true; //set is gate open to true
+            bright.setPosition(0);
+            bleft.setPosition(0);
             gate.setPosition(0.375); //open the gate
         }
         if (gamepad1.left_bumper || gamepad2.left_bumper)
@@ -122,19 +128,6 @@ public class chassis extends OpMode {
         } else
             sweep.setPower(0);
 
-        if (gamepad1.dpad_left) {
-            bleft.setPosition(0);
-        } else if (gamepad1.dpad_right) {
-            bleft.setPosition(1);
-        } else if (gamepad1.x) {
-            bright.setPosition(1);
-        } else if (gamepad1.y) {
-            bright.setPosition(0);
-        }
-        else {
-            bleft.setPosition(0.5);
-            bright.setPosition(0.5);
-        }
 
         if (gamepad1.dpad_up) {
             lift1.setPower(1);
@@ -221,7 +214,7 @@ public class chassis extends OpMode {
     public void voltageshoot() {
         voltage = batteryVoltage();
         double error = TARGET_VOLTAGE - voltage;
-        double motorOut = (error * kP) + .82;
+        double motorOut = (error * kP) + .85;
         motorOut = Range.clip(motorOut, 0, 1);
         setMotorPower(fly, motorOut);
     }
