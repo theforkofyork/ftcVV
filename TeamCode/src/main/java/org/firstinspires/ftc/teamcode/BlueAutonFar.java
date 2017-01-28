@@ -196,7 +196,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
                     state = State.Drive_To_Line;
                 } break;
                 case Drive_To_Line:
-                    if (robot.ODS.getLightDetected() <= 1.5) {
+                    if (odsReadingLinear <= 1.5 || robot.ODS.getLightDetected() <= 0.3) {
                        // encoderDrive(SLOW_SPEED,0.15,0.15,3);
                        powerDrive(0.1);
                         sleep(200);
@@ -585,7 +585,7 @@ public class BlueAutonFar extends LinearOpMode implements PID_Constants {
     public void voltageshoot() {
         voltage = batteryVoltage();
         double error = TARGET_VOLTAGE - voltage; //error will be target voltage subtracted by current voltage
-        double motorOut = (error * kP) + .8; //motor out is the error multiplied by our KP constant which is .18 and then it adds what ever error * kP to the target speed
+        double motorOut = (error * kP) + .82; //motor out is the error multiplied by our KP constant which is .18 and then it adds what ever error * kP to the target speed
         motorOut = Range.clip(motorOut, 0, 1); //make sure the motor doesn't go at a speed above 1
         setMotorPower(robot.fly, motorOut); // set the adjusted power to the motor
 
