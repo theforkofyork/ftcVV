@@ -23,8 +23,6 @@ public class chassis extends OpMode {
     DcMotor ml1;
     DcMotor fly;
     DcMotor sweep;
-    DcMotor lift1;
-    DcMotor lift2;
 
     public chassis() {
 
@@ -58,8 +56,6 @@ public class chassis extends OpMode {
         ml2 = hardwareMap.dcMotor.get("ml2");
         fly = hardwareMap.dcMotor.get("fly1");
         sweep = hardwareMap.dcMotor.get("sweep");
-        lift1 = hardwareMap.dcMotor.get("lift1");
-        lift2 = hardwareMap.dcMotor.get("lift2");
         gate = hardwareMap.servo.get("g");
         bright = hardwareMap.servo.get("b1");
         bleft = hardwareMap.servo.get("b2");
@@ -119,6 +115,14 @@ public class chassis extends OpMode {
             bleft.setPosition(0);
             gate.setPosition(0.375); //open the gate
         }
+        if (gamepad1.dpad_up) {
+            bright.setPosition(0);
+            bleft.setPosition(0);
+        }
+        if (gamepad1.dpad_down) {
+            bright.setPosition(1);
+            bleft.setPosition(1);
+        }
         if (gamepad1.left_bumper || gamepad2.left_bumper)
             sweep.setPower(-1);
         else if (gamepad1.left_trigger > 0.25 || gamepad2.left_trigger > 0.25)
@@ -129,16 +133,7 @@ public class chassis extends OpMode {
             sweep.setPower(0);
 
 
-        if (gamepad1.dpad_up) {
-            lift1.setPower(1);
-            lift2.setPower(1);
-        } else if (gamepad1.dpad_down) {
-            lift1.setPower(-1);
-            lift2.setPower(-1);
-        } else {
-            lift1.setPower(0);
-            lift2.setPower(0);
-        }
+
         telemetry.addData("left tgt pwr", "left  pwr: " + String.format("%.2f", left));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
         telemetry.addData("Voltage",batteryVoltage());
