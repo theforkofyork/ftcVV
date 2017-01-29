@@ -178,33 +178,43 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
                 case Drive_Forward: {  //Drive forward for 0.7 seconds then stop and switch states to the turning coder
                     voltageshoot();
                     robot.gate.setPosition(1);
-                    encoderDrive(SLOW_SPEED, 5, 5, 3);
+                    encoderDrive(SLOW_SPEED, 5, 5.5, 3);
                     state = State.Shoot;
                 }
                 break;
                 case Shoot: {
                     shoot();
+                    robot.bright.setPosition(1);
+                    robot.bleft.setPosition(1);
                     robot.fly.setPower(0);
                     state = State.Turn_To_Line;
                 }
                 break;
 
+
+
+
+
+
+
+
                 case Turn_To_Line: {
+
                     imuLeft(25,0.06);
                     state = State.Drive_To_Line;
                 }
                 break;
                 case Drive: {
                     powerDrive(0.15);
-                    sleep(1900);
-                    robot.rightDrive(-0.08);
-                    robot.leftDrive(-0.15);
-                    sleep(1900);
+                    sleep(1500);
+                    robot.rightDrive(-0.15);
+                    robot.leftDrive(-0.12);
+                    sleep(1100);
                     powerDrive(0);
                     state = State.WallALign;
                 } break;
                 case Drive_To_Line:
-                    if (odsReadingLinear <= 1.5 ) {
+                    if (odsReadingLinear2 <= 1.5 ) {
                         // encoderDrive(SLOW_SPEED,0.15,0.15,3);
                         powerDrive(0.1);
                         sleep(500);
@@ -224,11 +234,11 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
 
                 break;
                 case WallALign: {
-                    if (robot.rangeSensor.getDistance(DistanceUnit.CM) <= 14) {
+                    if (robot.rangeSensor.getDistance(DistanceUnit.CM) <= 12) {
                         encoderDrive(STOP,0,0,0);
                         state = State.Detect_Color;
                     }
-                    else if (robot.rangeSensor.getDistance(DistanceUnit.CM) > 14) {
+                    else if (robot.rangeSensor.getDistance(DistanceUnit.CM) > 12) {
                         powerDrive(0.1);
                     }
                 } break;
@@ -255,7 +265,7 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
                 case Red_Beacon: {
                     {
                         powerDrive(-0.15);
-                        sleep(900);
+                        sleep(1200);
                         powerDrive(0);
                         state = State.Turn_To_Beacon;
                     }
@@ -266,9 +276,9 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
                     {
                         sleep(6000);
                         powerDrive(0.15);
-                        sleep(500);
-                        powerDrive(-0.15);
                         sleep(900);
+                        powerDrive(-0.15);
+                        sleep(1200);
                         powerDrive(0);
                         state = State.Turn_To_Beacon;
                     }
@@ -281,7 +291,7 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
                 }
                 break;
                 case Turn_To_Beacon: { //Align to the beacon by turning -85 degrees
-                    imuRight(140,0.06);
+                    imuRight(21 ,0.1);
                     state = State.Park;
 
                 }
@@ -348,7 +358,7 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
                 break;
 
                 case Park: {
-                    encoderDrive(DRIVE_SPEED, 45, 45, 6);
+                    encoderDrive(SLOW_SPEED, -45, -45, 6);
                     state = State.Stop;
                 }
                 break;
@@ -575,7 +585,7 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
         robot.bleft.setPosition(0);
         robot.gate.setPosition(0.375);
         robot.sweep.setPower(0.4);
-        sleep(2000);
+        sleep(4000);
         robot.gate.setPosition(1);
         robot.sweep.setPower(0);
     }
@@ -590,10 +600,14 @@ public class RedAutonFar extends LinearOpMode implements PID_Constants {
     public void voltageshoot() {
         voltage = batteryVoltage();
         double error = TARGET_VOLTAGE - voltage; //error will be target voltage subtracted by current voltage
-        double motorOut = (error * kP) + .85; //motor out is the error multiplied by our KP constant which is .18 and then it adds what ever error * kP to the target speed
+        double motorOut = (error * kP) + .95; //motor out is the error multiplied by our KP constant which is .18 and then it adds what ever error * kP to the target speed
         motorOut = Range.clip(motorOut, 0, 1); //make sure the motor doesn't go at a speed above 1
         setMotorPower(robot.fly, motorOut); // set the adjusted power to the motor
 
     }
 
 }
+
+
+
+
