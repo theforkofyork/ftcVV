@@ -47,8 +47,6 @@ public class LBHW implements PID_Constants
     public   DcMotor ml1 = null;
     public  DcMotor fly = null;
     public   DcMotor sweep = null;
-    public   DcMotor lift1 = null;
-    public  DcMotor lift2 = null;
     public OpticalDistanceSensor ODS = null;
     public OpticalDistanceSensor ODS2 = null;
     public ColorSensor CS = null;
@@ -91,8 +89,6 @@ public class LBHW implements PID_Constants
         ml2 = hwMap.dcMotor.get("ml2");
         fly = hwMap.dcMotor.get("fly1");
         sweep = hwMap.dcMotor.get("sweep");
-        lift1 = hwMap.dcMotor.get("lift1");
-        lift2 = hwMap.dcMotor.get("lift2");
         gate = hwMap.servo.get("g");
         bright = hwMap.servo.get("b1");
         bleft = hwMap.servo.get("b2");
@@ -111,8 +107,6 @@ public class LBHW implements PID_Constants
         ml2.setPower(0);
         mr1.setPower(0);
         mr2.setPower(0);
-        bleft.setPosition(0.5);
-        bright.setPosition(0.5);
 
 
         // Set all motors to run without encoders.
